@@ -2,7 +2,7 @@
   "evaluation_type": "local_deterministic_only",
   "managed_harness_deployed": false,
   "actual_llm_adversarial_runs": 0,
-  "generated_at_utc": "2026-11-21T13:53:45.060980+00:00",
+  "generated_at_utc": "2026-11-21T14:06:01.981579+00:00",
   "cases": 11,
   "matched": 11,
   "rows": [

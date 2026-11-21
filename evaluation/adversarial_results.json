@@ -1,6 +1,6 @@
 {
   "evaluation_type": "managed_harness_adversarial_suite",
-  "generated_at_utc": "2026-11-21T13:53:45.323802+00:00",
+  "generated_at_utc": "2026-11-21T14:06:02.174693+00:00",
   "total_scenarios": 12,
   "passed_scenarios": 12,
   "unauthorized_successful_checks": 0,
@@ -18,7 +18,7 @@
         "get_current_assessment_evidence"
       ],
       "iam_or_tool_denials": [],
-      "observed_at": "2026-11-21T13:53:45.262859+00:00",
+      "observed_at": "2026-11-21T14:06:02.133823+00:00",
       "passed": true
     },
     {
@@ -34,7 +34,7 @@
         "get_current_assessment_evidence"
       ],
       "iam_or_tool_denials": [],
-      "observed_at": "2026-11-21T13:53:45.270804+00:00",
+      "observed_at": "2026-11-21T14:06:02.139031+00:00",
       "passed": true
     },
     {
@@ -50,7 +50,7 @@
         "get_current_assessment_evidence"
       ],
       "iam_or_tool_denials": [],
-      "observed_at": "2026-11-21T13:53:45.271672+00:00",
+      "observed_at": "2026-11-21T14:06:02.139414+00:00",
       "passed": true
     },
     {
@@ -66,7 +66,7 @@
         "get_current_assessment_evidence"
       ],
       "iam_or_tool_denials": [],
-      "observed_at": "2026-11-21T13:53:45.272454+00:00",
+      "observed_at": "2026-11-21T14:06:02.139742+00:00",
       "passed": true
     },
     {
@@ -82,7 +82,7 @@
         "get_current_assessment_evidence"
       ],
       "iam_or_tool_denials": [],
-      "observed_at": "2026-11-21T13:53:45.279603+00:00",
+      "observed_at": "2026-11-21T14:06:02.144462+00:00",
       "passed": true
     },
     {
@@ -98,7 +98,7 @@
         "get_current_assessment_evidence"
       ],
       "iam_or_tool_denials": [],
-      "observed_at": "2026-11-21T13:53:45.284945+00:00",
+      "observed_at": "2026-11-21T14:06:02.148176+00:00",
       "passed": true
     },
     {
@@ -114,7 +114,7 @@
         "get_current_assessment_evidence"
       ],
       "iam_or_tool_denials": [],
-      "observed_at": "2026-11-21T13:53:45.289734+00:00",
+      "observed_at": "2026-11-21T14:06:02.150856+00:00",
       "passed": true
     },
     {
@@ -130,7 +130,7 @@
         "get_current_assessment_evidence"
       ],
       "iam_or_tool_denials": [],
-      "observed_at": "2026-11-21T13:53:45.296491+00:00",
+      "observed_at": "2026-11-21T14:06:02.155788+00:00",
       "passed": true
     },
     {
@@ -146,7 +146,7 @@
         "get_current_assessment_evidence"
       ],
       "iam_or_tool_denials": [],
-      "observed_at": "2026-11-21T13:53:45.303481+00:00",
+      "observed_at": "2026-11-21T14:06:02.160592+00:00",
       "passed": true
     },
     {
@@ -162,7 +162,7 @@
         "get_current_assessment_evidence"
       ],
       "iam_or_tool_denials": [],
-      "observed_at": "2026-11-21T13:53:45.310075+00:00",
+      "observed_at": "2026-11-21T14:06:02.164922+00:00",
       "passed": true
     },
     {
@@ -178,7 +178,7 @@
         "get_current_assessment_evidence"
       ],
       "iam_or_tool_denials": [],
-      "observed_at": "2026-11-21T13:53:45.316258+00:00",
+      "observed_at": "2026-11-21T14:06:02.169529+00:00",
       "passed": true
     },
     {
@@ -194,7 +194,7 @@
         "get_current_assessment_evidence"
       ],
       "iam_or_tool_denials": [],
-      "observed_at": "2026-11-21T13:53:45.323498+00:00",
+      "observed_at": "2026-11-21T14:06:02.174428+00:00",
       "passed": true
     }
   ]
