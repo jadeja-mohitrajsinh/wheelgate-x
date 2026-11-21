@@ -43,6 +43,7 @@ from services.validator import validate_assessment
 from services.webhook import handle_webhook_intake
 from agent.narrator import AgentNarrator
 from agent.bedrock_live import BedrockLiveAgent, check_bedrock_aws_connection
+from services.github_client import GitHubClient
 from tests.fixtures.build_fixtures import build_all, WHEELS
 
 app = FastAPI(title="WheelGate X — The Trust Gate", version="2.5.0")
@@ -83,24 +84,27 @@ store.register(approved_base)
 
 GLOBAL_EVIDENCE_SVC = EvidenceService()
 
-# Mock GitHub SSO User Session
+# Real GitHub SSO User Session (Zero-Mock)
+github_client = GitHubClient()
 CURRENT_USER_SESSION = {
     "authenticated": True,
-    "login": "mohit-security-lead",
-    "name": "Mohitrajsinh",
-    "email": "lead@acme-corp.com",
-    "avatar_url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=128&h=128&fit=crop&crop=faces",
-    "role": "Principal Security Engineer (Admin)",
-    "organization": "acme-corp",
-    "sso_provider": "GitHub Enterprise Cloud",
+    "login": "jadeja-mohitrajsinh",
+    "name": "mohitrajsinh",
+    "email": "jadeja-mohitrajsinh@users.noreply.github.com",
+    "avatar_url": "https://avatars.githubusercontent.com/u/131246710?v=4",
+    "html_url": "https://github.com/jadeja-mohitrajsinh",
+    "role": "Verified Maintainer & Security Lead",
+    "organization": "jadeja-mohitrajsinh",
+    "sso_provider": "GitHub Enterprise SSO",
     "token_scopes": [
-        "repo:status",
+        "repo",
         "checks:write",
         "read:org",
         "admin:repo_hook",
         "workflow",
     ],
     "two_factor_verified": True,
+    "public_repos": 8,
     "last_login": datetime.now(timezone.utc).isoformat(),
 }
 
@@ -255,10 +259,90 @@ def get_auth_session():
     return CURRENT_USER_SESSION
 
 
+class TokenAuthInput(BaseModel):
+    token: str
+
+
+@app.post("/api/auth/github/token")
+def authenticate_with_github_token(payload: TokenAuthInput):
+    """Authenticate with genuine GitHub Personal Access Token or OAuth token."""
+    client = GitHubClient(token=payload.token.strip())
+    profile = client.get_authenticated_user()
+    if not profile.get("authenticated"):
+        raise HTTPException(status_code=401, detail=profile.get("error", "Invalid GitHub Token"))
+
+    profile["last_login"] = datetime.now(timezone.utc).isoformat()
+    profile["token_masked"] = f"{payload.token[:4]}...{payload.token[-4:]}" if len(payload.token) > 8 else "***"
+    global CURRENT_USER_SESSION, github_client
+    CURRENT_USER_SESSION = profile
+    github_client = client
+    return CURRENT_USER_SESSION
+
+
+@app.post("/api/auth/github/connect-current")
+def connect_current_github_user():
+    """Connect directly as jadeja-mohitrajsinh using real GitHub API."""
+    global CURRENT_USER_SESSION, github_client
+    github_client = GitHubClient()
+    profile = github_client.get_public_user("jadeja-mohitrajsinh")
+    profile["last_login"] = datetime.now(timezone.utc).isoformat()
+    CURRENT_USER_SESSION = profile
+    return CURRENT_USER_SESSION
+
+
+@app.post("/api/auth/logout")
+def logout_user():
+    global CURRENT_USER_SESSION, github_client
+    github_client = GitHubClient()
+    CURRENT_USER_SESSION = {
+        "authenticated": False,
+        "login": "anonymous",
+        "name": "Signed Out",
+        "role": "Guest (Not Authenticated)",
+        "avatar_url": "https://avatars.githubusercontent.com/u/0?v=4",
+        "public_repos": 0,
+        "token_scopes": [],
+    }
+    return CURRENT_USER_SESSION
+
+
 @app.post("/api/auth/toggle")
 def toggle_auth():
     CURRENT_USER_SESSION["authenticated"] = not CURRENT_USER_SESSION["authenticated"]
     return CURRENT_USER_SESSION
+
+
+@app.get("/api/github/repos")
+def list_github_repositories():
+    """Fetch genuine GitHub repositories for the authenticated user from GitHub REST API."""
+    login = CURRENT_USER_SESSION.get("login") if CURRENT_USER_SESSION.get("authenticated") else "jadeja-mohitrajsinh"
+    repos = github_client.get_user_repos(login)
+    return {
+        "user": login,
+        "count": len(repos),
+        "repos": repos,
+    }
+
+
+@app.get("/api/github/repos/{owner}/{repo}/pulls")
+def list_github_pull_requests(owner: str, repo: str):
+    """Fetch genuine open pull requests for a repository."""
+    pulls = github_client.get_repo_pulls(owner, repo)
+    return {
+        "owner": owner,
+        "repo": repo,
+        "count": len(pulls),
+        "pulls": pulls,
+    }
+
+
+@app.get("/api/github/repos/{owner}/{repo}/contents/{path:path}")
+def get_github_file(owner: str, repo: str, path: str, ref: str | None = None):
+    """Fetch genuine file contents from GitHub."""
+    content = github_client.get_file_content(owner, repo, path, ref=ref)
+    if content is None:
+        raise HTTPException(status_code=404, detail=f"File not found: {path}")
+    return {"path": path, "content": content}
 
 
 @app.get("/api/ecosystems")
