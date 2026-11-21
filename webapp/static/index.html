@@ -748,11 +748,107 @@
       <!-- VIEW 6: BEDROCK HARNESS & IAM SETTINGS -->
       <!-- ===================================================================== -->
       <section id="view-harness" class="hidden space-y-6">
-        <div>
-          <h1 class="text-xl font-bold text-white tracking-tight">Bedrock AgentCore Managed Harness & IAM</h1>
-          <p class="text-xs text-slate-400 mt-1">Cryptographic separation of privileges between explanation agent and check publisher.</p>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2.5 mb-1.5">
+              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 code-font">AWS Bedrock Managed Agent</span>
+              <span id="bedrockStatusPill" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">AgentCore Active</span>
+            </div>
+            <h1 class="text-xl font-bold text-white tracking-tight">Amazon Bedrock Managed Agent & Scoped IAM</h1>
+            <p class="text-xs text-slate-400 mt-1">Plain-language rule set (R1–R12) enforced via Bedrock AgentCore harness, action groups, and isolated publisher.</p>
+          </div>
+
+          <div class="flex items-center space-x-3">
+            <button onclick="triggerBedrockInvocation()" id="btnInvokeBedrock" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold text-xs flex items-center space-x-2 shadow-lg shadow-indigo-500/20 transition cursor-pointer">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              <span>Invoke Bedrock Agent (boto3)</span>
+            </button>
+          </div>
         </div>
 
+        <!-- Bedrock Live AWS Connection Header Bar -->
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+            <span class="text-[10px] uppercase font-bold text-slate-500 block">Agent Name & Model</span>
+            <div class="text-slate-200 font-bold truncate mt-1">WheelGateX-ExplanationAgent</div>
+            <span class="text-[10px] text-cyan-400 font-mono">Claude 3.5 Sonnet / Nova Pro</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+            <span class="text-[10px] uppercase font-bold text-slate-500 block">Agent ID & Alias</span>
+            <div id="bedrockAgentId" class="text-slate-200 font-mono text-xs truncate mt-1">WGX-BEDROCK-AGENT-PROD</div>
+            <span id="bedrockAliasId" class="text-[10px] text-emerald-400 font-mono">LiveProduction (Alias: TSTALIASID)</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+            <span class="text-[10px] uppercase font-bold text-slate-500 block">Scoped IAM Role</span>
+            <div class="text-slate-300 font-mono text-[10px] truncate mt-1">arn:aws:iam::*:role/WheelGateXRole</div>
+            <span class="text-[10px] text-slate-400">Least-Privilege Scoped</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+            <span class="text-[10px] uppercase font-bold text-slate-500 block">AWS Deployment State</span>
+            <div id="bedrockModeText" class="text-emerald-400 font-bold flex items-center space-x-1.5 mt-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Bedrock Agent Ready</span>
+            </div>
+            <span class="text-[10px] text-slate-500">Region: us-east-1</span>
+          </div>
+        </div>
+
+        <!-- Interactive Bedrock Invocation & Reasoning Trace -->
+        <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="activity" class="w-4 h-4 text-purple-400"></i>
+              <h2 class="text-sm font-bold text-white uppercase tracking-wider">Bedrock Live Reasoning Trace & Guardrail Stream</h2>
+            </div>
+            <span class="text-[10px] text-slate-500 font-mono">Pre-processing &bull; Orchestration &bull; Post-processing</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <input id="bedrockPromptInput" type="text" value="Explain why candidate wheel samplepkg==1.0.1 was assessed and what risks exist." class="md:col-span-2 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 font-mono focus:border-indigo-500">
+            <button onclick="triggerBedrockInvocation()" class="py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center space-x-2 shadow-md transition">
+              <i data-lucide="play" class="w-3.5 h-3.5"></i>
+              <span>Run Trace Execution</span>
+            </button>
+          </div>
+
+          <!-- Trace Steps Container -->
+          <div id="bedrockTraceContainer" class="space-y-3 pt-2">
+            <!-- Dynamically populated trace cards -->
+            <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400 text-center">
+              Click "Run Trace Execution" or "Invoke Bedrock Agent" to stream the live Bedrock AgentCore reasoning trace and guardrail screening steps.
+            </div>
+          </div>
+        </div>
+
+        <!-- Plain Language Rules Matrix (R1 - R12) -->
+        <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="list-checks" class="w-4 h-4 text-emerald-400"></i>
+              <h2 class="text-sm font-bold text-white uppercase tracking-wider">Plain-Language Rules Matrix (Rules R1 – R12)</h2>
+            </div>
+            <span class="text-xs text-emerald-400 font-mono font-bold">12 / 12 RULES ENFORCED</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs font-mono">
+              <thead class="bg-slate-950 text-slate-400 uppercase text-[10px] border-b border-slate-800">
+                <tr>
+                  <th class="py-2.5 px-3">Rule ID</th>
+                  <th class="py-2.5 px-3">Rule Name</th>
+                  <th class="py-2.5 px-3">Plain-Language Requirement</th>
+                  <th class="py-2.5 px-3">Enforcement Layer</th>
+                  <th class="py-2.5 px-3">Status</th>
+                </tr>
+              </thead>
+              <tbody id="rulesTableBody" class="divide-y divide-slate-800/60 text-[11px]">
+                <!-- Dynamically populated from API -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Scoped Capabilities & Tool Whitelist -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
             <div class="flex items-center space-x-2 border-b border-slate-800 pb-3">
@@ -773,7 +869,7 @@
           <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
             <div class="flex items-center space-x-2 border-b border-slate-800 pb-3">
               <i data-lucide="ban" class="w-5 h-5 text-red-400"></i>
-              <h2 class="text-sm font-bold text-white uppercase tracking-wider">Explicitly Disallowed Capabilities</h2>
+              <h2 class="text-sm font-bold text-white uppercase tracking-wider">Explicitly Disallowed Capabilities (R5, R6, R7)</h2>
             </div>
             <div class="space-y-2 text-xs font-mono">
               <div class="p-2.5 rounded-lg bg-slate-950 border border-red-900/40 text-red-400 flex items-center justify-between">
@@ -786,6 +882,10 @@
               </div>
               <div class="p-2.5 rounded-lg bg-slate-950 border border-red-900/40 text-red-400 flex items-center justify-between">
                 <span>secretsmanager:GetSecretValue</span>
+                <span class="text-[9px] uppercase font-bold text-red-500">DENIED</span>
+              </div>
+              <div class="p-2.5 rounded-lg bg-slate-950 border border-red-900/40 text-red-400 flex items-center justify-between">
+                <span>s3:PutObject / s3:DeleteObject</span>
                 <span class="text-[9px] uppercase font-bold text-red-500">DENIED</span>
               </div>
             </div>
@@ -953,6 +1053,7 @@
       await loadScenarios();
       await loadBaselines();
       await loadAdversarialList();
+      await loadBedrockHarness();
 
       // Keyboard shortcut ⌘K / Ctrl+K
       window.addEventListener('keydown', (e) => {
@@ -1484,6 +1585,115 @@
       const box = document.getElementById('whResultBox');
       box.classList.remove('hidden');
       box.textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function loadBedrockHarness() {
+      try {
+        const res = await fetch('/api/bedrock/status');
+        const data = await res.json();
+        
+        document.getElementById('bedrockAgentId').textContent = data.status.agent_id || 'WGX-BEDROCK-AGENT-PROD';
+        document.getElementById('bedrockAliasId').textContent = `${data.status.alias_id || 'LiveProduction'} (${data.status.mode})`;
+        
+        const pill = document.getElementById('bedrockStatusPill');
+        const modeText = document.getElementById('bedrockModeText');
+        if (data.status.connected) {
+          pill.className = 'text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20';
+          pill.textContent = `AWS Live: ${data.status.region}`;
+          modeText.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span>Live AWS Bedrock</span>`;
+        } else {
+          pill.className = 'text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20';
+          pill.textContent = 'AgentCore Harness Active';
+          modeText.innerHTML = `<span class="w-2 h-2 rounded-full bg-cyan-400"></span><span>Bedrock Harness (Local)</span>`;
+        }
+
+        const tbody = document.getElementById('rulesTableBody');
+        tbody.innerHTML = '';
+        (data.rules || []).forEach(r => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="py-2.5 px-3 text-cyan-400 font-bold">${r.id}</td>
+            <td class="py-2.5 px-3 text-slate-200 font-bold">${r.name}</td>
+            <td class="py-2.5 px-3 text-slate-400 text-[11px] font-sans">${r.desc}</td>
+            <td class="py-2.5 px-3 text-emerald-400 text-[10px]">${r.id === 'R4' ? 'Bedrock Guardrail' : (r.id === 'R6' || r.id === 'R7' ? 'Scoped IAM Role' : 'Deterministic Backend')}</td>
+            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded font-mono text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ENFORCED</span></td>
+          `;
+          tbody.appendChild(tr);
+        });
+        lucide.createIcons();
+      } catch (err) {
+        console.error('Failed to load bedrock harness status:', err);
+      }
+    }
+
+    async function triggerBedrockInvocation() {
+      const prompt = document.getElementById('bedrockPromptInput').value;
+      const btn = document.getElementById('btnInvokeBedrock');
+      const container = document.getElementById('bedrockTraceContainer');
+      const originalHTML = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Invoking Bedrock Agent...</span>`;
+      lucide.createIcons();
+
+      container.innerHTML = `<div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 flex items-center space-x-2">
+        <i data-lucide="loader" class="w-4 h-4 animate-spin text-purple-400"></i>
+        <span>Invoking Amazon Bedrock Agent Runtime and streaming execution trace...</span>
+      </div>`;
+      lucide.createIcons();
+
+      try {
+        const res = await fetch('/api/bedrock/invoke', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            session_id: 'bedrock-session-demo',
+            prompt: prompt
+          })
+        });
+        const data = await res.json();
+        
+        container.innerHTML = '';
+        (data.trace_steps || []).forEach(step => {
+          const card = document.createElement('div');
+          card.className = 'p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5 text-xs font-mono';
+          const stageBadgeColor = step.stage.includes('Guardrail') ? 'bg-red-500/10 text-red-400 border-red-500/20' : (step.stage.includes('Orchestration') ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20');
+          card.innerHTML = `
+            <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+              <div class="flex items-center space-x-2">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${stageBadgeColor}">${step.stage}</span>
+                <span class="text-slate-300 font-bold">${step.type}</span>
+              </div>
+              <span class="text-slate-500 text-[10px]">${step.timestamp}</span>
+            </div>
+            <div class="text-[11px] text-slate-300 font-sans pt-1">
+              <span class="text-cyan-400 font-mono font-bold">${step.rule_enforced}:</span> ${step.details || step.scoped_boundaries || step.rationale || 'Processed'}
+            </div>
+          `;
+          container.appendChild(card);
+        });
+
+        // Add final narrative card
+        if (data.narrative) {
+          const nCard = document.createElement('div');
+          nCard.className = 'p-4 rounded-xl bg-purple-950/20 border border-purple-800/50 space-y-2 text-xs';
+          nCard.innerHTML = `
+            <div class="flex items-center space-x-2 text-purple-300 font-bold text-xs uppercase tracking-wider">
+              <i data-lucide="bot" class="w-4 h-4"></i>
+              <span>Final Bedrock Model Structured Narrative</span>
+            </div>
+            <p class="text-slate-200 text-xs leading-relaxed font-sans">${data.narrative.summary}</p>
+            <div class="text-[11px] text-emerald-400 font-mono">Recommendation: ${data.narrative.recommendation}</div>
+          `;
+          container.appendChild(nCard);
+        }
+
+      } catch (err) {
+        container.innerHTML = `<div class="p-3 rounded-lg bg-red-950/50 border border-red-800 text-red-300 text-xs">Error invoking Bedrock agent: ${err.message}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+        lucide.createIcons();
+      }
     }
 
     window.onload = init;

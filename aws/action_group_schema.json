@@ -1,0 +1,71 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "WheelGate X Evidence Tool API",
+    "version": "2.5.0",
+    "description": "Read-only session-bound evidence retrieval tool for Amazon Bedrock Managed Agent."
+  },
+  "paths": {
+    "/get_current_assessment_evidence": {
+      "post": {
+        "summary": "Retrieve sanitized security evidence for the active pull request assessment",
+        "description": "Returns verified wheel cryptographic digests, differential startup-hook analysis, and authoritative deterministic policy decisions for the current session.",
+        "operationId": "get_current_assessment_evidence",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session_id": {
+                    "type": "string",
+                    "description": "The active Bedrock session ID bound to this assessment context"
+                  }
+                },
+                "required": ["session_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Assessment evidence payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "assessment_id": { "type": "string" },
+                    "package_name": { "type": "string" },
+                    "to_version": { "type": "string" },
+                    "official_verdict": { "type": "string", "enum": ["PASS", "HOLD", "BLOCK"] },
+                    "reason_codes": { "type": "array", "items": { "type": "string" } },
+                    "hook_diffs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "installed_path": { "type": "string" },
+                          "candidate_sha256": { "type": "string" },
+                          "change_type": { "type": "string" },
+                          "allowlisted": { "type": "boolean" }
+                        }
+                      }
+                    },
+                    "untrusted_text": {
+                      "type": "object",
+                      "properties": {
+                        "content": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

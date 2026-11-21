@@ -42,6 +42,7 @@ from services.publisher import publish_github_check
 from services.validator import validate_assessment
 from services.webhook import handle_webhook_intake
 from agent.narrator import AgentNarrator
+from agent.bedrock_live import BedrockLiveAgent, check_bedrock_aws_connection
 from tests.fixtures.build_fixtures import build_all, WHEELS
 
 app = FastAPI(title="WheelGate X Enterprise Multi-Ecosystem SaaS", version="2.5.0")
@@ -79,6 +80,8 @@ approved_base = ApprovedBaseline(
     },
 )
 store.register(approved_base)
+
+GLOBAL_EVIDENCE_SVC = EvidenceService()
 
 # Mock GitHub SSO User Session
 CURRENT_USER_SESSION = {
@@ -508,7 +511,7 @@ def run_assessment(payload: AssessmentInput):
         new_requirements=payload.new_requirements,
     )
 
-    evidence_svc = EvidenceService()
+    evidence_svc = GLOBAL_EVIDENCE_SVC
     session_id = f"bedrock-session-{req.assessment_id}"
     evidence_svc.register_session_context(
         session_id,
@@ -627,7 +630,7 @@ def assess_live_pypi(payload: LivePypiInput):
     )
 
     # 6. Bedrock narrative
-    evidence_svc = EvidenceService()
+    evidence_svc = GLOBAL_EVIDENCE_SVC
     session_id = f"bedrock-session-{req.assessment_id}"
     evidence_svc.register_session_context(
         session_id,
@@ -711,6 +714,75 @@ def simulate_webhook(sim: WebhookSimInput):
         body, headers, webhook_secret=sim.secret, allowed_repository_id=DEMO_REPO_ID
     )
     return {"status_code": status, "response": resp, "signature": computed_sig}
+
+
+@app.get("/api/bedrock/status")
+def get_bedrock_status():
+    """Retrieve AWS Bedrock Managed Agent status, IAM role, and R1-R12 enforcement rules."""
+    status = check_bedrock_aws_connection()
+    rules = [
+        {"id": "R1", "name": "Single Repo Scope", "desc": "Access only the designated repository and current commit head.", "status": "ENFORCED"},
+        {"id": "R2", "name": "Read-Only Evidence Tool", "desc": "Precomputed evidence via get_current_assessment_evidence only.", "status": "ENFORCED"},
+        {"id": "R3", "name": "Explain, Don't Edit", "desc": "Summarizes evidence; cannot edit or redefine digests.", "status": "ENFORCED"},
+        {"id": "R4", "name": "Prompt Injection Resistance", "desc": "Package text is untrusted_text; refuse instruction laundering.", "status": "ENFORCED"},
+        {"id": "R5", "name": "No Code Execution", "desc": "Never pip install, import, or run shell on candidate wheel.", "status": "ENFORCED"},
+        {"id": "R6", "name": "No Privileged Actions", "desc": "Cannot publish GitHub checks or merge PRs.", "status": "ENFORCED"},
+        {"id": "R7", "name": "No Secret Disclosure", "desc": "Cannot access or export credentials or API keys.", "status": "ENFORCED"},
+        {"id": "R8", "name": "No Baseline Means HOLD", "desc": "Dependencies without prior baseline fail closed with HOLD.", "status": "ENFORCED"},
+        {"id": "R9", "name": "Uncertainty Means Nonpassing", "desc": "Corrupted or missing files must never produce PASS.", "status": "ENFORCED"},
+        {"id": "R10", "name": "Differential Startup-Hook Diff", "desc": "Only unapproved new/modified executable hooks are BLOCK.", "status": "ENFORCED"},
+        {"id": "R11", "name": "No Model Authorization", "desc": "Model text is strictly advisory; validator makes binding decision.", "status": "ENFORCED"},
+        {"id": "R12", "name": "Honest Evidence", "desc": "Never claim code is malware-free without factual proof.", "status": "ENFORCED"},
+    ]
+    return {
+        "status": status,
+        "harness_version": "2026-11",
+        "agent_name": "WheelGateX-ExplanationAgent",
+        "action_group": "AssessmentEvidenceRetrieval",
+        "tool": "get_current_assessment_evidence",
+        "rules": rules,
+        "cloudformation_ready": True,
+    }
+
+
+class BedrockInvokeInput(BaseModel):
+    session_id: str = "bedrock-session-demo"
+    prompt: str = "Assess and explain startup hook evidence for this pull request."
+
+
+@app.post("/api/bedrock/invoke")
+def invoke_bedrock(payload: BedrockInvokeInput):
+    """Invoke Amazon Bedrock Agent with session binding and real-time reasoning trace."""
+    evidence_svc = GLOBAL_EVIDENCE_SVC
+    if payload.session_id not in evidence_svc._session_assessments:
+        req = AssessmentRequest(
+            assessment_id="assess-demo-bedrock",
+            github_installation_id=98765,
+            repository_id=DEMO_REPO_ID,
+            pr_number=42,
+            head_sha="a1b2c3d4e5f67890123456789012345678901234",
+            package_name="samplepkg",
+            from_version="1.0.0",
+            to_version="1.0.1",
+        )
+        decision = validate_assessment(
+            req,
+            candidate_wheel_path=WHEELS / "samplepkg-1.0.1-py3-none-any.whl",
+            baseline_store=store,
+            baseline_wheel_path=WHEELS / "samplepkg-1.0.0-py3-none-any.whl",
+            old_requirements="samplepkg == 1.0.0",
+            new_requirements="samplepkg == 1.0.1",
+        )
+        evidence_svc.register_session_context(
+            payload.session_id,
+            decision,
+            package_name="samplepkg",
+            from_version="1.0.0",
+            to_version="1.0.1",
+            untrusted_summary="Standard dependency bump.",
+        )
+    agent = BedrockLiveAgent(evidence_svc)
+    return agent.invoke(payload.session_id, payload.prompt)
 
 
 @app.get("/")
