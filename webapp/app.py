@@ -1,4 +1,4 @@
-"""WheelGate X Enterprise Multi-Ecosystem SaaS Web Application.
+"""WheelGate X — The Trust Gate web application.
 
 Features:
 1. Multi-Ecosystem differential execution gate:
@@ -45,7 +45,7 @@ from agent.narrator import AgentNarrator
 from agent.bedrock_live import BedrockLiveAgent, check_bedrock_aws_connection
 from tests.fixtures.build_fixtures import build_all, WHEELS
 
-app = FastAPI(title="WheelGate X Enterprise Multi-Ecosystem SaaS", version="2.5.0")
+app = FastAPI(title="WheelGate X — The Trust Gate", version="2.5.0")
 
 app.add_middleware(
     CORSMiddleware,
