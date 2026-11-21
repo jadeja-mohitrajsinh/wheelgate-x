@@ -200,6 +200,16 @@ All high-resolution evidence screenshots are captured from the running applicati
 - **PR Check Success (Legitimate Update Passed):** [evidence/github-check-pass.png](file:///d:/code/wheelgate_x_day1_tested/wheelgate_x_day1/evidence/github-check-pass.png)
 - **Adversarial Attack Lab (12/12 Defended):** [evidence/adversarial-lab.png](file:///d:/code/wheelgate_x_day1_tested/wheelgate_x_day1/evidence/adversarial-lab.png)
 - **Live PyPI Registry Verification:** [evidence/live-pypi-verification.png](file:///d:/code/wheelgate_x_day1_tested/wheelgate_x_day1/evidence/live-pypi-verification.png)
+- **Amazon Bedrock Managed Agent & Reasoning Trace:** [evidence/bedrock-managed-agent.png](file:///d:/code/wheelgate_x_day1_tested/wheelgate_x_day1/evidence/bedrock-managed-agent.png)
+
+### Two-Repository Architecture for Live Verification
+1. **Core Engine & Gate Repository (`wheelgate_x_day1`):** Contains the complete deterministic engine, AWS Bedrock AgentCore harness, CloudFormation stack, and SaaS web application.
+2. **Consumer Test Target Repository (`demo-python-service`):** A standalone realistic consumer repository simulating protected microservices with branches ready for pull request testing:
+   - `main`: Baseline package pinned (`samplepkg == 1.0.0`) with `wheelgate.json` registration.
+   - `feature/bump-benign`: Legitimate version update (`samplepkg == 1.0.1`).
+   - `feature/malicious-hook`: Injected unapproved `.pth` hook (`samplepkg == 1.0.3`).
+   - `feature/prompt-injection`: Metadata prompt attack attempting system override (`samplepkg == 1.0.11`).
+   - `feature/live-pypi-six`: Live PyPI registry genuine update (`six == 1.16.0`).
 
 ### How to Run Locally
 ```bash
