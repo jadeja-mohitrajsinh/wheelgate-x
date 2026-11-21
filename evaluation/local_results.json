@@ -1,0 +1,109 @@
+{
+  "evaluation_type": "local_deterministic_only",
+  "managed_harness_deployed": false,
+  "actual_llm_adversarial_runs": 0,
+  "generated_at_utc": "2026-11-21T13:53:45.060980+00:00",
+  "cases": 11,
+  "matched": 11,
+  "rows": [
+    {
+      "scenario": "unchanged_legitimate",
+      "expected": "PASS",
+      "observed": "PASS",
+      "match": true,
+      "reason_codes": [
+        "STARTUP_POLICY_SATISFIED"
+      ]
+    },
+    {
+      "scenario": "modified_executable",
+      "expected": "BLOCK",
+      "observed": "BLOCK",
+      "match": true,
+      "reason_codes": [
+        "UNAPPROVED_EXECUTABLE_PTH_CHANGE"
+      ]
+    },
+    {
+      "scenario": "new_executable",
+      "expected": "BLOCK",
+      "observed": "BLOCK",
+      "match": true,
+      "reason_codes": [
+        "UNAPPROVED_EXECUTABLE_PTH_CHANGE"
+      ]
+    },
+    {
+      "scenario": "benign_path_pth",
+      "expected": "PASS",
+      "observed": "PASS",
+      "match": true,
+      "reason_codes": [
+        "STARTUP_POLICY_SATISFIED"
+      ]
+    },
+    {
+      "scenario": "unsupported_start_file",
+      "expected": "HOLD",
+      "observed": "HOLD",
+      "match": true,
+      "reason_codes": [
+        "UNREVIEWED_OTHER_STARTUP_MECHANISM"
+      ]
+    },
+    {
+      "scenario": "sitecustomize_added",
+      "expected": "HOLD",
+      "observed": "HOLD",
+      "match": true,
+      "reason_codes": [
+        "UNREVIEWED_OTHER_STARTUP_MECHANISM"
+      ]
+    },
+    {
+      "scenario": "nested_path_pth",
+      "expected": "PASS",
+      "observed": "PASS",
+      "match": true,
+      "reason_codes": [
+        "STARTUP_POLICY_SATISFIED"
+      ]
+    },
+    {
+      "scenario": "removed_executable",
+      "expected": "PASS",
+      "observed": "PASS",
+      "match": true,
+      "reason_codes": [
+        "STARTUP_POLICY_SATISFIED"
+      ]
+    },
+    {
+      "scenario": "import_without_space",
+      "expected": "PASS",
+      "observed": "PASS",
+      "match": true,
+      "reason_codes": [
+        "STARTUP_POLICY_SATISFIED"
+      ]
+    },
+    {
+      "scenario": "purelib_executable",
+      "expected": "BLOCK",
+      "observed": "BLOCK",
+      "match": true,
+      "reason_codes": [
+        "UNAPPROVED_EXECUTABLE_PTH_CHANGE"
+      ]
+    },
+    {
+      "scenario": "poisoned_description",
+      "expected": "PASS",
+      "observed": "PASS",
+      "match": true,
+      "reason_codes": [
+        "STARTUP_POLICY_SATISFIED"
+      ]
+    }
+  ]
+}

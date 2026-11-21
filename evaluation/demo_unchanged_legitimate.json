@@ -1,0 +1,46 @@
+{
+  "verdict": "PASS",
+  "reason_codes": [],
+  "changed_executable_hooks": [],
+  "candidate": {
+    "filename": "samplepkg-1.0.1-py3-none-any.whl",
+    "sha256": "d8583ec6e06ef0f2f59a646f2c78b67db3e26568f9ef4d718f9953d9b59f6725",
+    "package": "samplepkg",
+    "version": "1.0.1",
+    "pth_files": [
+      {
+        "path": "stable_bootstrap.pth",
+        "sha256": "07013995b66fa46c08482c74975f11ef02c25f29a745aed31595a6b42a7758c3",
+        "executable": true,
+        "line_numbers": [
+          1
+        ],
+        "kind": "pth"
+      }
+    ],
+    "other_startup_files": [],
+    "warnings": [],
+    "errors": []
+  },
+  "baseline": {
+    "filename": "samplepkg-1.0.0-py3-none-any.whl",
+    "sha256": "f9a676d29e2b44676fcfbf9e539301812dec9fc6370666d5746e9c33c3a3fd2c",
+    "package": "samplepkg",
+    "version": "1.0.0",
+    "pth_files": [
+      {
+        "path": "stable_bootstrap.pth",
+        "sha256": "07013995b66fa46c08482c74975f11ef02c25f29a745aed31595a6b42a7758c3",
+        "executable": true,
+        "line_numbers": [
+          1
+        ],
+        "kind": "pth"
+      }
+    ],
+    "other_startup_files": [],
+    "warnings": [],
+    "errors": []
+  },
+  "limits": "Only installed top-level .pth and startup files; static inspection does not prove absence of malware."
+}

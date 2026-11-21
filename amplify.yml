@@ -1,0 +1,12 @@
+version: 1
+frontend:
+  phases:
+    build:
+      commands:
+        - echo "Building WheelGate X Static Dashboard..."
+  artifacts:
+    baseDirectory: webapp/static
+    files:
+      - '**/*'
+  cache:
+    paths: []

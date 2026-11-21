@@ -1,0 +1,23 @@
+{
+  "harnessVersion": "2026-11",
+  "name": "WheelGateX-ExplanationAgent",
+  "description": "Amazon Bedrock AgentCore managed-harness agent for explaining Python wheel startup-hook security evidence.",
+  "role": "arn:aws:iam::123456789012:role/WheelGateXManagedAgentRole",
+  "modelId": "amazon.titan-text-premier-v1:0",
+  "allowedTools": [
+    "get_current_assessment_evidence"
+  ],
+  "disallowedCapabilities": [
+    "bedrock-agentcore:InvokeAgentRuntimeCommand",
+    "bedrock-agentcore:ExecuteCode",
+    "bedrock-agentcore:WriteCheck",
+    "secretsmanager:GetSecretValue",
+    "s3:PutObject"
+  ],
+  "guardrails": {
+    "promptAttackScreening": true,
+    "piiRedaction": true
+  },
+  "maxTokens": 2048,
+  "temperature": 0.0
+}
